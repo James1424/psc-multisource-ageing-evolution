@@ -1,0 +1,42 @@
+{
+  "hartono_n_curves": 2245,
+  "hartono_first_shape": [
+    900,
+    1
+  ],
+  "accelerated_temperatures_c": [
+    25,
+    35,
+    45,
+    55,
+    65
+  ],
+  "accelerated_n_pixels": 144,
+  "accelerated_n_device_temperature_groups": 39,
+  "chakar_tables": {
+    "outdoor_mpp_d1_p2": [
+      1596555,
+      4
+    ],
+    "outdoor_mpp_d1_p1": [
+      1596556,
+      4
+    ],
+    "indoor_jvs": [
+      9954,
+      6
+    ],
+    "irradiance_and_cell_temp": [
+      1594440,
+      3
+    ],
+    "outdoor_mpp_d1_p4": [
+      1596554,
+      4
+    ],
+    "outdoor_jvs": [
+      35,
+      5
+    ]
+  }
+}
