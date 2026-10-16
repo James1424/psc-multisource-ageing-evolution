@@ -1,0 +1,59 @@
+name: train-all-versions
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'versions/**'
+      - 'benchmark/**'
+      - 'data/processed/**'
+      - '.github/workflows/train-all-versions.yml'
+
+jobs:
+  train:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [v0.1, v0.2, v0.3, v0.4, v0.5, v0.6, v0.7, v0.8]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Train ${{ matrix.version }}
+        run: benchmark/run_version.sh ${{ matrix.version }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.version }}
+          path: |
+            versions/${{ matrix.version }}/results/*.csv
+            versions/${{ matrix.version }}/results/*.png
+          if-no-files-found: error
+
+  compare:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pandas numpy matplotlib tabulate
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: results-*
+          path: downloaded
+      - name: Restore version results
+        run: |
+          for v in v0.1 v0.2 v0.3 v0.4 v0.5 v0.6 v0.7 v0.8; do
+            mkdir -p versions/$v/results
+            cp -a downloaded/results-$v/. versions/$v/results/
+          done
+      - run: python benchmark/aggregate_results.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: version-comparison
+          path: results/
